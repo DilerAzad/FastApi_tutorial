@@ -8,19 +8,19 @@ from app.services.shipment import ShipmentService
 from app.services.seller import SellerService
 
 
-#Asynchronous database session dep annotation
+# Asynchronous database session dep annotation
 SessionDep = Annotated[AsyncSession, Depends(get_session)]
 
-# Shipment servide dep
+# Shipment service dep
 def get_shipment_service(session: SessionDep) -> ShipmentService:
     return ShipmentService(session)
 
-# Seller servide dep
-def get_seller_service(session: SessionDep):
-    return SellerService(session)
-
 #Shipment service dep annotation
 ShipmentServiceDep = Annotated[ShipmentService, Depends(get_shipment_service)]
+
+# Seller service dep
+def get_seller_service(session: SessionDep):
+    return SellerService(session)
 
 #Seller service dep annotation
 SellerServiceDep = Annotated[SellerService, Depends(get_seller_service)]

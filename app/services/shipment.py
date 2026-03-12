@@ -21,7 +21,7 @@ class ShipmentService:
     
     async def update(self, id: int, shipment_update: ShipmentUpdate) -> Shipment:
         shipment = await self.get(id)
-        shipment.sqlmodel_update(shipment_update)  # ty:ignore[possibly-missing-attribute]
+        shipment.sqlmodel_update(shipment_update) # ty:ignore[possibly-missing-attribute]
 
         self.session.add(shipment)
         await self.session.commit()
