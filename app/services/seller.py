@@ -1,3 +1,4 @@
+from app.utils import generate_access_token
 from fastapi import HTTPException, status
 from app.api.schemas.seller import SellerCreate
 from passlib.context import CryptContext
@@ -41,19 +42,16 @@ class SellerService:
             is_valid = self.pwd_context.verify(sha, seller.password_hash) or \
                        self.pwd_context.verify(password, seller.password_hash)
             
-        print("########################",seller, is_valid)
         if not seller or not is_valid:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid credentials")
-        token = jwt.encode(
-            payload={
+        
+        token = generate_access_token(
+            data={
                 "user": {
                     "name": seller.name,
                     "email": seller.email
-                },
-                "exp" : datetime.now() + timedelta(hours=1)
-            },
-            key=security_settings.JWT_SECRET_KEY,
-            algorithm=security_settings.JWT_ALGORITHM
+                }
+            }
         )
 
         return token

@@ -1,8 +1,10 @@
+from app.utils import decode_access_token
 from typing import Annotated
 from app.api.schemas.seller import SellerRead
 from app.api.dependencies import SellerServiceDep
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
+from app.core.security import oauth2_scheme
 from ..schemas.seller import SellerCreate
 
 
@@ -25,4 +27,16 @@ async def login_seller(
     return {
         "access_token": token,
         "type": "jwt"
+    }
+
+@router.get("/dashboard")
+async def get_dashboard(token:Annotated[str, Depends(oauth2_scheme)]):
+    data = decode_access_token(token)
+
+    if data is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid access token")
+
+    return {
+        "details" : "Successfully verified",
+        "data" : data
     }
