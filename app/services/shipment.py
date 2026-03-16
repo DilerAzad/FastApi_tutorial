@@ -1,3 +1,5 @@
+from uuid import UUID
+from app.database.models import Seller
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.schemas.shipment import ShipmentCreate, ShipmentUpdate
@@ -9,17 +11,21 @@ class ShipmentService:
     def __init__(self, session: AsyncSession):
         self.session = session
     
-    async def add(self, shipment: ShipmentCreate) -> Shipment:
-        new_shipment = Shipment(**shipment.model_dump())
+    async def add(self, 
+    shipment: ShipmentCreate,
+    seller: Seller
+    ) -> Shipment:
+        new_shipment = Shipment(**shipment.model_dump(), 
+                                seller_id=seller.id)
         self.session.add(new_shipment)
         await self.session.commit()
         await self.session.refresh(new_shipment)
         return new_shipment
     
-    async def get(self, id: int) -> Shipment:
+    async def get(self, id: UUID) -> Shipment:
         return await self.session.get(Shipment, id)
     
-    async def update(self, id: int, shipment_update: ShipmentUpdate) -> Shipment:
+    async def update(self, id: UUID, shipment_update: ShipmentUpdate) -> Shipment:
         shipment = await self.get(id)
         shipment.sqlmodel_update(shipment_update) # ty:ignore[possibly-missing-attribute]
 
@@ -28,6 +34,6 @@ class ShipmentService:
         await self.session.refresh(shipment)
         return shipment
     
-    async def delete(self, id: int) -> None:
+    async def delete(self, id: UUID) -> None:
         await self.session.delete(await self.get(id))
         await self.session.commit()

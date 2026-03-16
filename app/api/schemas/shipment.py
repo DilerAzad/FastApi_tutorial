@@ -1,3 +1,5 @@
+from app.database.models import Seller
+from uuid import UUID
 import datetime
 
 from pydantic import BaseModel, Field
@@ -11,6 +13,8 @@ class BaseShipment(BaseModel):
 
 
 class ShipmentRead(BaseShipment):
+    id: UUID
+    seller: Seller
     status: ShipmentStatus
     estimated_delivery: datetime.datetime
 

@@ -35,6 +35,8 @@ class SellerService:
 
         seller = result.scalar()
 
+        self.session.get(Seller, seller.id)
+
         sha = hashlib.sha256(password.encode()).hexdigest()
         
         is_valid = False
@@ -49,7 +51,7 @@ class SellerService:
             data={
                 "user": {
                     "name": seller.name,
-                    "email": seller.email
+                    "id": str(seller.id)
                 }
             }
         )

@@ -1,3 +1,7 @@
+from app.database.redis import add_jti_to_blacklist
+from app.api.dependencies import get_access_token
+from app.database.models import Seller
+from app.api.dependencies import SessionDep
 from app.utils import decode_access_token
 from typing import Annotated
 from app.api.schemas.seller import SellerRead
@@ -29,14 +33,11 @@ async def login_seller(
         "type": "jwt"
     }
 
-@router.get("/dashboard")
-async def get_dashboard(token:Annotated[str, Depends(oauth2_scheme)]):
-    data = decode_access_token(token)
-
-    if data is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid access token")
-
+@router.get("/logout")
+async def logout_seller(
+    token_data: Annotated[dict, Depends(get_access_token)]
+):
+    await add_jti_to_blacklist(token_data["jti"])
     return {
-        "details" : "Successfully verified",
-        "data" : data
+        "detail": "Logged out successfully"
     }
